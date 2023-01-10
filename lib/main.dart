@@ -54,7 +54,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _getStringResult() async {
     try {
-      final String result = await platform.invokeMethod('getStringResult');
+      final String result =
+          await platform.invokeMethod('getStringResult', {"msg": "Jim"});
       print("_getStringResult is " + result);
     } on PlatformException catch (e) {
       print("Failed to _getStringResult: ${e.message}");
@@ -63,7 +64,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _getListResult() async {
     try {
-      final List result = await platform.invokeMethod('getListResult');
+      final List result = await platform.invokeMethod('getListResult', {
+        "msg": ["Python"]
+      });
       print("_getlistResult is " + result.toString());
     } on PlatformException catch (e) {
       print("Failed to _getlistResult: ${e.message}");
@@ -72,7 +75,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _getMapResult() async {
     try {
-      final Map result = await platform.invokeMethod('getMapResult');
+      final Map result = await platform.invokeMethod('getMapResult', {
+        "msg": {"hobby": "PingPang"}
+      });
       print("_getMapResult is " + result.toString());
     } on PlatformException catch (e) {
       print("Failed to _getMapResult: ${e.message}");

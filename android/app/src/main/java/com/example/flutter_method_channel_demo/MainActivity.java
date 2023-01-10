@@ -22,13 +22,17 @@ public class MainActivity extends FlutterActivity {
             @Override
             public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
                 if(call.method.equals("getStringResult")){
-                    String msg = getStringResult();
+                    String param = call.argument("msg");
+                    String msg = getStringResult(param);
                     result.success(msg);
                 }else if(call.method.equals("getListResult")){
-                    List msg = getListResult();
+                    List<String> params = call.argument("msg");
+                    List<String> msg = getListResult(params);
                     result.success(msg);
                 }else if(call.method.equals("getMapResult")){
-                    Map<String,Object> msg = getMapResult();
+                    Map<String,Object> params = call.argument("msg");
+                    System.out.println("map params is "+params);
+                    Map<String,Object> msg = getMapResult(params);
                     result.success(msg);
                 }else {
                     result.notImplemented();
@@ -37,21 +41,23 @@ public class MainActivity extends FlutterActivity {
         });
     }
 
-    public String getStringResult(){
-        return "HelloWorld";
+    public String getStringResult(String msg){
+        return msg+"HelloWorld";
     }
 
-    public List getListResult(){
-        List list = new ArrayList();
+    public List<String> getListResult(List<String> params){
+        List<String> list = new ArrayList();
         list.add("Android");
         list.add("Ios");
+        list.addAll(params);
         return list;
     }
 
-    public Map<String,Object> getMapResult(){
-        Map map = new HashMap();
+    public Map<String,Object> getMapResult(Map<String,Object> params){
+        Map<String,Object> map = new HashMap();
         map.put("name","jim");
         map.put("age",15);
+        map.putAll(params);
         return map;
     }
 }
