@@ -14,6 +14,7 @@ import io.flutter.plugin.common.MethodChannel;
 
 public class MainActivity extends FlutterActivity {
     private String CHANNEL = "channel_demo";
+    private String ANOTHERCHANNEL = "another_channel";
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -24,6 +25,27 @@ public class MainActivity extends FlutterActivity {
                 if(call.method.equals("getStringResult")){
                     String param = call.argument("msg");
                     String msg = getStringResult(param);
+                    result.success(msg);
+                }else if(call.method.equals("getListResult")){
+                    List<String> params = call.argument("msg");
+                    List<String> msg = getListResult(params);
+                    result.success(msg);
+                }else if(call.method.equals("getMapResult")){
+                    Map<String,Object> params = call.argument("msg");
+                    System.out.println("map params is "+params);
+                    Map<String,Object> msg = getMapResult(params);
+                    result.success(msg);
+                }else {
+                    result.notImplemented();
+                }
+            }
+        });
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),ANOTHERCHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+            @Override
+            public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+                if(call.method.equals("getStringResult")){
+                    String param = call.argument("msg");
+                    String msg = param+" I am another channel";
                     result.success(msg);
                 }else if(call.method.equals("getListResult")){
                     List<String> params = call.argument("msg");

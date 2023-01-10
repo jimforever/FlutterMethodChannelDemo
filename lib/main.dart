@@ -50,12 +50,23 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = MethodChannel("channel_demo");
+  static const anotherPlatform = MethodChannel("another_channel");
   int _counter = 0;
 
   Future<void> _getStringResult() async {
     try {
       final String result =
           await platform.invokeMethod('getStringResult', {"msg": "Jim"});
+      print("_getStringResult is " + result);
+    } on PlatformException catch (e) {
+      print("Failed to _getStringResult: ${e.message}");
+    }
+  }
+
+  Future<void> _getAnotherStringResult() async {
+    try {
+      final String result =
+          await anotherPlatform.invokeMethod('getStringResult', {"msg": "Jim"});
       print("_getStringResult is " + result);
     } on PlatformException catch (e) {
       print("Failed to _getStringResult: ${e.message}");
@@ -143,7 +154,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () => _getListResult(),
                 child: Text("_getListResult")),
             TextButton(
-                onPressed: () => _getMapResult(), child: Text("_getMapResult"))
+                onPressed: () => _getMapResult(), child: Text("_getMapResult")),
+            TextButton(
+                onPressed: () => _getAnotherStringResult(),
+                child: Text("_getAnotherPlatformStringResult"))
           ],
         ),
       ),
