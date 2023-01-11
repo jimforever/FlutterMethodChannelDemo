@@ -33,7 +33,11 @@ public class MainActivity extends FlutterActivity {
             } else {
                 double percentage = ((double) count / TOTAL_COUNT);
                 Log.w(TAG_NAME, "\nParsing From Native:  " + percentage);
-                event.success(percentage);
+                Map<String,Map<String,Object>> container = new HashMap<>();
+                Map<String,Object> content = new HashMap<>();
+                content.put("percentage",percentage);
+                container.put("functionName",content);
+                event.success(container);
             }
             count++;
             handler.postDelayed(this, 200);
