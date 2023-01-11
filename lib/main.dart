@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -51,7 +53,26 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = MethodChannel("channel_demo");
   static const anotherPlatform = MethodChannel("another_channel");
-  int _counter = 0;
+  static const stream = EventChannel("stream_demo");
+  late StreamSubscription _streamSubscription;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _startListener();
+  }
+
+  void _startListener() {
+    _streamSubscription = stream.receiveBroadcastStream().listen(_listenStream);
+  }
+
+  void _cancelListener() {
+    _streamSubscription.cancel();
+  }
+
+  void _listenStream(value) {
+    print("Received From Native:  $value\n");
+  }
 
   Future<void> _getStringResult() async {
     try {
@@ -95,17 +116,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -140,13 +150,6 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
             TextButton(
                 onPressed: () => _getStringResult(),
                 child: Text("_getStringResult")),
@@ -161,11 +164,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

@@ -1,5 +1,8 @@
 package com.example.flutter_method_channel_demo;
 
+import android.os.Handler;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -9,12 +12,34 @@ import java.util.Map;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 public class MainActivity extends FlutterActivity {
     private String CHANNEL = "channel_demo";
     private String ANOTHERCHANNEL = "another_channel";
+    private String STREAM = "stream_demo";
+    final String TAG_NAME = "From_Native";
+    private int count = 1;
+    private Handler handler;
+    private EventChannel.EventSink event;
+    private final Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            int TOTAL_COUNT = 100;
+            if (count > TOTAL_COUNT) {
+                event.endOfStream();
+            } else {
+                double percentage = ((double) count / TOTAL_COUNT);
+                Log.w(TAG_NAME, "\nParsing From Native:  " + percentage);
+                event.success(percentage);
+            }
+            count++;
+            handler.postDelayed(this, 200);
+        }
+    };
+
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -61,6 +86,36 @@ public class MainActivity extends FlutterActivity {
                 }
             }
         });
+        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), STREAM).setStreamHandler(
+                new EventChannel.StreamHandler() {
+                    @Override
+                    public void onListen(Object args, final EventChannel.EventSink events) {
+                        Log.w(TAG_NAME, "Adding listener");
+                        event = events;
+                        count = 1;
+                        handler = new Handler();
+                        runnable.run();
+                    }
+
+                    @Override
+                    public void onCancel(Object args) {
+                        Log.w(TAG_NAME, "Cancelling listener");
+                        handler.removeCallbacks(runnable);
+                        handler = null;
+                        count = 1;
+                        event = null;
+                        System.out.println("StreamHandler - onCanceled: ");
+                    }
+                }
+        );
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacks(runnable);
+        handler = null;
+        event = null;
     }
 
     public String getStringResult(String msg){
